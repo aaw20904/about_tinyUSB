@@ -1,16 +1,16 @@
 /*To integrate  the TinyUSB into a STM32CubeIDE project:
  1)Create a folder "libraries"
-   -----------------------------------------------------------------------
+----------------------------------***----------------------------------------
  2)Create inner folders "tinyusb/src/" 
-   -----------------------------------------------------------------------
+   --------------------------------***--------------------------------------
  3)Copy inside src/ the next folders: class, common, device, osal, portable
    and files tusb.c, tusb.h, tusb_option.h.
-     -----------------------------------------------------------------------
+     ------------------------------***-----------------------------------------
  4)Right click on "libraries" folder, properties->C/C++BuildSettings.There are a flag 
   "Exclude resource from build", uncheck it to enable compile this folder.
-    -----------------------------------------------------------------------
+    --------------------------------***---------------------------------------
  5)Stay the folder "portable/st/stm32_fsdev/" 
-   -----------------------------------------------------------------------
+   ----------------------------------***-------------------------------------
  6) Add include pats inside compiler optoins:
    Project → Properties → C/C++ General → paths And Symbols → GNU C
    Push "Add" and insert consequently the next strings:
@@ -23,7 +23,7 @@
 	libraries/tinyusb/src/osal
 	libraries/TinyUSB/src/portable/st/stm32_fsdev
 	NOTE: Add neccessary in both "Assembly" and "GNU C" (these options are next each to other)
-	  -----------------------------------------------------------------------
+	  --------------------------------***---------------------------------------
  7)Create in "Core/Inc/" confiuration file "tusb_config.h":
 */
 #pragma once
@@ -40,7 +40,7 @@
 7)Enable USB only ( HAL middleware must be turned OFF),
   enable interrupt handlers for USB, 
   re-build the code.
-  -----------------------------------------------------------------------
+  -------------------------------***----------------------------------------
 8)Modify interrupt handler, include "tusb.h" in ISR file, 
    remove inner HAL function-handler (stay only interrupt procedures),
    insert tinyusb's   function  "tud_int_handler()":
@@ -70,7 +70,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
 }
   tud_int_handler(0);   // call TinyUSB ISR
-/*----------------------------------------------------------------------------------------
+/*--------------------------------------***--------------------------------------------------
 9)Initialize TinyUSB in main():
 */
 #include "tusb.h"
@@ -301,7 +301,7 @@ uint16_t const * tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
     return desc_str;
 }
-/*---------------------------------------------------------------------
+/*-------------------------------***--------------------------------------
 10) Disable TinyUSB OS abstraction (osal) if you are not use operating system:
   in the file "tusb_config.h" 
 */
@@ -309,7 +309,7 @@ uint16_t const * tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 #define CFG_TUSB_OS   OPT_OS_NONE
 
 //This fixes include error:  'fatal error: osal/osal.h not found!'
-/*-------------------------------------------------------------------------------------
+/*--------------------------------***------------------------------------------
 11)Implement callbacks inside  usb_descriptors.c OR in main.c (your choice):
 */
 void tud_vendor_rx_cb(uint8_t itf, uint8_t const* buffer, uint16_t bufsize)
@@ -323,6 +323,7 @@ void tud_vendor_tx_done_cb(uint8_t itf)
 {
     // TX finished, may queue next packet
 }
+
 
 
 
