@@ -27,3 +27,27 @@
 	<windows.h>
 	"libusb.h"
 
+1764261283 source:d:\c_win_proj\libusb_learn\libusb_dyn.c
+	"libusb_dyn.h"
+	<stdio.h>
+
+1764261283 d:\c_win_proj\libusb_learn\libusb_dyn.h
+	<windows.h>
+	"libusb.h"
+
+1764261283 d:\c_win_proj\libusb_learn\libusb.h
+	<basetsd.h>
+	<limits.h>
+	<stdint.h>
+	<sys/types.h>
+	<sys/time.h>
+	<time.h>
+	<windows.h>
+	<winsock.h>
+
+1764267155 source:d:\c_win_proj\libusb_learn\main.c
+	<stdio.h>
+	<stdlib.h>
+	"libusb.h"
+	"libusb_dyn.h"
+
