@@ -41,8 +41,8 @@
   enable interrupt handlers for USB, 
   re-build the code.
   -----------------------------------------------------------------------
-8)Modify interrupt handler, include "tusb.h" HAL functions, 
-   remove HAL function-handler (stay only interrupt procedures),
+8)Modify interrupt handler, include "tusb.h" in ISR file, 
+   remove inner HAL function-handler (stay only interrupt procedures),
    insert tinyusb's   function  "tud_int_handler()":
 */
 void USB_HP_CAN1_TX_IRQHandler(void)
@@ -323,5 +323,6 @@ void tud_vendor_tx_done_cb(uint8_t itf)
 {
     // TX finished, may queue next packet
 }
+
 
 
