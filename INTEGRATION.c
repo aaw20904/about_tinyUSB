@@ -1,4 +1,4 @@
-/*To integrate  TinyUSB into STM32CubeIDE project:
+/*To integrate  the TinyUSB into a STM32CubeIDE project:
  1)Create a folder "libraries"
    -----------------------------------------------------------------------
  2)Create inner folders "tinyusb/src/" 
@@ -323,6 +323,7 @@ void tud_vendor_tx_done_cb(uint8_t itf)
 {
     // TX finished, may queue next packet
 }
+
 
 
 
