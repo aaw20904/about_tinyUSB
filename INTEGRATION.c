@@ -324,6 +324,55 @@ void tud_vendor_tx_done_cb(uint8_t itf)
     // TX finished, may queue next packet
 }
 
+/*---------------------------------***------------------------------------------
+12) NOTE:   V E N D O R    S P E C I F I C    D E V I C E S    O N L Y
+In TinyUSB's for (CDC, HID,.. ) Tx callback was realized and  was written .
+But for the Vendor (CDC-Free) class, the *_tx_complete_cb() callback is NOT implemented,
+and a programer should implemented it.
+A) open it: "tinyusb/src/class/vendor/vendor_device.c"
+FIND the next function:
+*/
+void vendor_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes)
+{
+    uint8_t itf = ep_addr & 0x0F;
+    if (tu_edpt_dir(ep_addr))
+    {
+        // IN transfer complete (a Device Tx complete) 
+        // TODO: Nothing done here!
+    }
+    else
+    {
+        // OUT transfer
+        tud_vendor_rx_cb(itf);
+    }
+}
+
+//Modify the "IF" statement as described belov:
+ 
+if (tu_edpt_dir(ep_addr))
+{
+    // IN transfer (device → host) completed
+    extern void tud_vendor_tx_done_cb(uint8_t itf);
+    tud_vendor_tx_done_cb(itf);
+}
+/*
+B) Open the file "tinyusb/src/class/vendor/vendor_device.h" and add 
+a weak implementation.With TU_ATTR_WEAK, the linker won’t complain if the user does not define it.
+*/
+TU_ATTR_WEAK void tud_vendor_tx_done_cb(uint8_t itf);
+
+/*
+C) Now the later added callback in "main.c" file will be fired on each Tx completion.
+Here is this callback, it was added in the step 11:
+*/
+void tud_vendor_tx_done_cb(uint8_t itf)
+{
+    // Your event: data has been completely transmitted
+    // Example: give semaphore
+}
+
+
+
 
 
 
