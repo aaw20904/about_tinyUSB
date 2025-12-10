@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string.h"
-unsigned char voice_buffer[32];
+unsigned char voice_buffer[32]__attribute__((aligned(64)));;
 
 typedef struct {
 int dma_processed;
@@ -30,7 +30,7 @@ int onArrive(int usb_parsel_size /*in bytes*/, unsigned char* incomingData) {
 
   // 1)Has DMA jumped to a new transaction?
   //a)current value of the DMA pointer:
-      header_stream.dma_ptr = ((header_stream.transferSize -  header_stream.cndtr) * DMA_WIDH) +  header_stream.CIRC_BUF_START;
+      header_stream.dma_ptr = ((header_stream.CIRC_BUF_SIZE -  header_stream.cndtr) * DMA_WIDH) +  header_stream.CIRC_BUF_START;
   //b)Was there wrapping?
   if ( header_stream.dma_ptr <  header_stream.dma_ptr_old) {
       //when wrapping was occured, calculate processed data (last BEFORE end and FIRST after BEGIN of the circ buffer):
@@ -46,16 +46,19 @@ int onArrive(int usb_parsel_size /*in bytes*/, unsigned char* incomingData) {
   if (( header_stream.transport_ptr + parselSize) >  header_stream.CIRC_BUF_END) {
     //when a wrap will ouccured - write data by two steps:
     //a)Write the first part - write until buffer`s END :
-    sliceSize =  header_stream.transport_ptr -  header_stream.CIRC_BUF_END;
+    sliceSize = (header_stream.CIRC_BUF_END + 1) - header_stream.transport_ptr;
     memcpy( header_stream.transport_ptr, incomingData,sliceSize);
-    usb_parsel_size = parselSize- sliceSize; //update amount of data - (because a first part has been written)
+    parselSize = parselSize- sliceSize; //update amount of data - (because a first part has been written)
     incomingData = incomingData + sliceSize; //move a pointer (because a first part has been written)
      header_stream.transport_ptr =  header_stream.CIRC_BUF_START; //update the pointer, it must point to the begin of the circular DMA buffer
     //b)Write the second part - from BEGIN of circular DMA buffer to achieve full incoming USB data amount
-    memcpy( header_stream.transport_ptr, incomingData, parselSize);
+    memcpy( (void*)header_stream.transport_ptr, incomingData, parselSize);
   } else {
+       header_stream.CIRC_BUF_START[0] = '@';
    //when there was no wrapping - move data easily :
-    memcpy( header_stream.transport_ptr, incomingData, parselSize);
+    memcpy( (void*)header_stream.transport_ptr, incomingData, parselSize);
+    //update a pointer
+    header_stream.transport_ptr += usb_parsel_size;
   }
   //3) Calculate difference between DMA consumed data amount (now) and USB transfered data amount (previous)
     header_stream.actual_difference =   header_stream.dma_processed -  header_stream.prev_transport_processed;
@@ -89,15 +92,18 @@ int main() {
    header_stream.CIRC_BUF_START = &voice_buffer[0]; //  margin-start
    header_stream.CIRC_BUF_END = &voice_buffer[31]; //  margin-end
    header_stream.CIRC_BUF_SIZE = 32;
-   header_stream.transferSize = 8;
+   header_stream.transferSize = 4;
    //load some data into array
    strcpy (voice_buffer,".00102030405060708090A0B0C0D0E0F10");
    header_stream.cndtr = 32;
    header_stream.dma_ptr = header_stream.CIRC_BUF_START;
-   header_stream.dma_ptr_old = header_stream.CIRC_BUF_END - header_stream.transferSize;
-   header_stream.transport_ptr =  header_stream.CIRC_BUF_START + (header_stream.transferSize / 2);
-   header_stream.transport_ptr_old = header_stream.CIRC_BUF_END -  header_stream.transferSize;
-   onArrive(4,"XXXX");
+   header_stream.dma_ptr_old =header_stream.dma_ptr;
+   header_stream.transport_ptr =  header_stream.CIRC_BUF_START + (header_stream.CIRC_BUF_SIZE  / 2);
+   header_stream.transport_ptr_old = header_stream.transport_ptr;
+   onArrive(13,"XXXXXXXXXXXXX");
+   memcpy((void*)header_stream.dma_ptr, "------------", 12);
+   header_stream.cndtr -= 12;
+   onArrive(5,"YYYYY");
 
 
     printf("Hello world!\n");

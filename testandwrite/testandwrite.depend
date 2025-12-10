@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1765387966 source:d:\c_win_proj\testandwrite\main.c
+	<stdio.h>
+	<stdlib.h>
+	"string.h"
+
