@@ -15,7 +15,7 @@ typedef struct {
   int DMA_BUS_WIDTH; //a width of a bus of the DMA channel (byte, word, dword)
 }stream_head;
 
-stream_head hOfStream;
+stream_head __attribute__((aligned(64))) hOfStream;
 
 
 int onNewUsbDataCb (unsigned char* newUsbParcelPtr, int usbParcelLengh ) {
@@ -26,6 +26,7 @@ int onNewUsbDataCb (unsigned char* newUsbParcelPtr, int usbParcelLengh ) {
    int prevUsbPacketSize; //in bytes
    ///! HERE MUST be a procedure to read the 'live' CNDTR value from a MCU into the hOfStream.dmaReminderCurr
    //1)Was a DMA pointer been wrapped?
+   printf("%d \n",hOfStream.dmaReminderPrev);
    if (hOfStream.dmaReminderCurr > hOfStream.dmaReminderPrev) {
      //when a DMA was gone through begin cell(CNDTR= DMA_BUFFER_STEPS means first cell, CNDTR=0 means last cell )
       dmaConsumed = hOfStream.dmaReminderPrev + (hOfStream.DMA_BUFFER_STEPS - hOfStream.dmaReminderCurr);
@@ -38,13 +39,12 @@ int onNewUsbDataCb (unsigned char* newUsbParcelPtr, int usbParcelLengh ) {
      //2)Update dmaReminderPrev
      hOfStream.dmaReminderPrev = hOfStream.dmaReminderCurr;
      //3)will a  transportPtrCurr be wrapped when we write a new data?
-     if( (usbIncomLen + hOfStream.transportPtrCurr) > hOfStream.CIRC_ARR_END ) {
+     if( ((usbIncomLen-1) + hOfStream.transportPtrCurr) > hOfStream.CIRC_ARR_END ) {
           //a) write the first part  until the END buffer`s cell
          var1 = (hOfStream.CIRC_ARR_END - hOfStream.transportPtrCurr) + 1; //data amount until buffer_end
          memcpy(hOfStream.transportPtrCurr, newUsbParcelPtr, var1);      //copy
          newUsbParcelPtr += var1;    //update a pointer
          usbIncomLen -= var1;  //correct data about subtract written value
-         hOfStream.transportPtrCurr += var1;
           //b) write the second part from START until all data was written
          hOfStream.transportPtrCurr = hOfStream.CIRC_ARR_START;
          memcpy(hOfStream.transportPtrCurr, newUsbParcelPtr,  usbIncomLen);
@@ -53,6 +53,10 @@ int onNewUsbDataCb (unsigned char* newUsbParcelPtr, int usbParcelLengh ) {
       //when wrap will not happened - write a new data by the easist way
          memcpy(hOfStream.transportPtrCurr, newUsbParcelPtr,  usbIncomLen);
          hOfStream.transportPtrCurr += usbIncomLen;//update a pointer
+     }
+     //when a pointer is great that array`s MAX element, assign first:
+     if(hOfStream.transportPtrCurr > hOfStream.CIRC_ARR_END){
+        hOfStream.transportPtrCurr = hOfStream.CIRC_ARR_START;
      }
      //3)Calculate a correction for a host: DMA_consumed - prevUsbransferSize
       hostCorrection =  dmaConsumed - hOfStream.prevUsbransferSize;
@@ -79,10 +83,15 @@ int main()
     hOfStream.prevUsbransferSize = 0; //data hasnt been transfered yet
     hOfStream.dmaReminderCurr = 32;
     hOfStream.dmaReminderPrev = 32;
-    hOfStream.transportPtrCurr = hOfStream.CIRC_ARR_START + (hOfStream.DMA_BUFFER_STEPS * hOfStream.DMA_BUS_WIDTH);
-
-    onNewUsbDataCb("example",7);
-
+    hOfStream.transportPtrCurr = hOfStream.CIRC_ARR_START + ((hOfStream.DMA_BUFFER_STEPS / 2) * hOfStream.DMA_BUS_WIDTH);
+    strcpy(dma_buff,".102030405060708090a0b0c0d0e0f10");
+    onNewUsbDataCb("UkrainE",7);
+    hOfStream.dmaReminderCurr = 26;
+    onNewUsbDataCb("UkrainE",7);
+    hOfStream.dmaReminderCurr = 5;
+     onNewUsbDataCb("<XYZ>",5);
+    hOfStream.dmaReminderCurr = 30;
+     onNewUsbDataCb("<XYZ>",5);
     printf("Hello world!\n");
     return 0;
 }
