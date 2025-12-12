@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1743445502 source:d:\win_proj\testandwrivev2\testandwritev2\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1765477363 source:d:\c_win_proj\testandwrivev2\testandwritev2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1765530255 source:d:\win_proj\testandwritev2\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
