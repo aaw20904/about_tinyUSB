@@ -5,6 +5,7 @@
    --------------------------------***--------------------------------------
  3)Copy inside src/ the next folders: class, common, device, osal, portable
    and files tusb.c, tusb.h, tusb_option.h.
+   //NOTE: copy portable/ST for STM32F103, and "portable/synopsys" for STM32F405
      ------------------------------***-----------------------------------------
  4)Right click on "libraries" folder, properties->C/C++BuildSettings.There are a flag 
   "Exclude resource from build", uncheck it to enable compile this folder.
@@ -22,7 +23,9 @@
 	libraries/TinyUSB/src/class
 	libraries/tinyusb/src/osal
 	libraries/TinyUSB/src/portable/st/stm32_fsdev
-	NOTE: Add neccessary in both "Assembly" and "GNU C" (these options are next each to other)
+	//NOTE1: FOR STM32F405 exclude  libraries/TinyUSB/src/portable/st/stm32_fsdev
+     and add libraries/tinyusb/src/portable/synopsys/dwc2 instead 
+	NOTE2: Add neccessary in both "Assembly" and "GNU C" (these options are next each to other)
 	  --------------------------------***---------------------------------------
  7)Create in "Core/Inc/" confiuration file "tusb_config.h":
 */
@@ -324,6 +327,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
     // TX finished
 	 GPIOC->BSRR = GPIO_BSRR_BS13;
 }
+
 
 
 
