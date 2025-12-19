@@ -134,7 +134,7 @@ typedef struct __attribute__((packed))
 {
     usb_config_descriptor_t        config;
     usb_interface_descriptor_t     interface0;
-    tusb_desc_endpoint_t       ep_out_1;
+    tusb_desc_endpoint_t       ep_out_1;  //instance of defined in tinyUSB structure - endpoint descriptor 
     tusb_desc_endpoint_t        ep_in_1;
 } usb_full_config_t;
 
@@ -326,6 +326,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
     // TX finished
 	 GPIOC->BSRR = GPIO_BSRR_BS13;
 }
+
 
 
 
