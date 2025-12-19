@@ -100,16 +100,7 @@ Here the example of vendor
 
 //USER custom definition - to have explicit descriptors insted of embedded macroses:
 
-//ENDPOINT descriptor
-typedef struct __attribute__((packed))
-{
-    uint8_t  bLength;
-    uint8_t  bDescriptorType;
-    uint8_t  bEndpointAddress;
-    uint8_t  bmAttributes;
-    uint16_t wMaxPacketSize;
-    uint8_t  bInterval;
-} usb_endpoint_descriptor_t;
+ 
 
 //INTERFACE descriptor
 typedef struct __attribute__((packed))
@@ -143,8 +134,8 @@ typedef struct __attribute__((packed))
 {
     usb_config_descriptor_t        config;
     usb_interface_descriptor_t     interface0;
-    usb_endpoint_descriptor_t      ep_out_1;
-    usb_endpoint_descriptor_t      ep_in_1;
+    tusb_desc_endpoint_t       ep_out_1;
+    tusb_desc_endpoint_t        ep_in_1;
 } usb_full_config_t;
 
 //The instance of full descriptor with inner descriptors and definitions
@@ -174,21 +165,29 @@ usb_full_config_t const desc_cfg =
     },
 
     .ep_out_1 = {
-        .bLength            = 7,
-        .bDescriptorType    = TUSB_DESC_ENDPOINT,
-        .bEndpointAddress   = 0x01,      // OUT endpoint 1
-        .bmAttributes       = 0x02,      // BULK
-        .wMaxPacketSize     = 64,
-        .bInterval          = 0
+        .bLength          = sizeof(tusb_desc_endpoint_t),
+    	    .bDescriptorType  = TUSB_DESC_ENDPOINT,
+    	    .bEndpointAddress = 0x01,               // EP1 OUT
+    	    .bmAttributes = {
+    	        .xfer  = TUSB_XFER_BULK,
+    	        .sync  = 0,
+    	        .usage = 0,
+    	    },
+    	    .wMaxPacketSize   = 64,
+    	    .bInterval        = 0
     },
 
     .ep_in_1 = {
-        .bLength            = 7,
-        .bDescriptorType    = TUSB_DESC_ENDPOINT,
-        .bEndpointAddress   = 0x81,      // IN endpoint 1
-        .bmAttributes       = 0x02,      // BULK
-        .wMaxPacketSize     = 64,
-        .bInterval          = 0
+       .bLength          = sizeof(tusb_desc_endpoint_t),
+    		    .bDescriptorType  = TUSB_DESC_ENDPOINT,
+    		    .bEndpointAddress = 0x81,               // EP1 IN
+    		    .bmAttributes = {
+    		        .xfer  = TUSB_XFER_BULK,
+    		        .sync  = 0,
+    		        .usage = 0,
+    		    },
+    		    .wMaxPacketSize   = 64,
+    		    .bInterval        = 0
     },
 };
 
@@ -327,6 +326,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
     // TX finished
 	 GPIOC->BSRR = GPIO_BSRR_BS13;
 }
+
 
 
 
