@@ -314,18 +314,48 @@ uint16_t const * tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 /*--------------------------------***------------------------------------------
 11)Implement callbacks inside  usb_descriptors.c OR in main.c (your choice):
 */
-void tud_vendor_rx_cb(uint8_t itf, uint8_t const* buffer, uint16_t bufsize)
+//NOTE: here is the example of callbacks for BULK endpoints 
+void tud_vendor_rx_cb(uint8_t itf,  const uint8_t* buffer, uint32_t bufsize)
 {
-    uint8_t buf[64];
-    uint32_t count = tud_vendor_read(buf, bufsize);
-    // do something with received bytes
+
+    uint32_t count = tud_vendor_available();
+    if (count == 0){
+    	return;
+    }
+    //copying incoming data inside user`s buffer 
+    bytesReceived = tud_vendor_read(outUsbBuffer, sizeof(outUsbBuffer));
+
+		    if(bytesReceived > 0){
+				//when data exists, set the semaphore
+		    	GPIOB->BSRR = GPIO_BSRR_BS10;
+		    	 mySemaphore = 1;
+		    }
 }
 
 void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 {
     // TX finished
-	 GPIOC->BSRR = GPIO_BSRR_BS13;
+	 GPIOB->BSRR = GPIO_BSRR_BR11;
 }
+
+///now response with echo in the main():
+ while (1)
+  {
+	  tud_task();          // TinyUSB background task, insert it insideinfinite loop or the SysTick handler.
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+	  if((mySemaphore & 0x00000001) && tud_ready() ){
+		  GPIOB->BSRR = GPIO_BSRR_BR10;
+		  mySemaphore &= ~0x00000001;
+		  uint32_t n = tud_vendor_write(outUsbBuffer, bytesReceived);
+		  if (n) {
+			   tud_vendor_write_flush();   // VERY important
+		  }
+
+		   GPIOB->BSRR = GPIO_BSRR_BS11;
+	  }
+  }
 
 
 
