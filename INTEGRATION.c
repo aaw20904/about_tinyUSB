@@ -39,6 +39,7 @@
 #define CFG_TUD_VENDOR              1
 #define CFG_TUD_VENDOR_RX_BUFSIZE   64
 #define CFG_TUD_VENDOR_TX_BUFSIZE   64
+#define CFG_TUSB_OS   OPT_OS_NONE   /*no operating system*/
 /*
 7)Enable USB only ( HAL middleware must be turned OFF),
   enable interrupt handlers for USB, 
@@ -304,15 +305,9 @@ uint16_t const * tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     return desc_str;
 }
 /*-------------------------------***--------------------------------------
-10) Disable TinyUSB OS abstraction (osal) if you are not use operating system:
-  in the file "tusb_config.h" 
-*/
-
-#define CFG_TUSB_OS   OPT_OS_NONE
-
-//This fixes include error:  'fatal error: osal/osal.h not found!'
-/*--------------------------------***------------------------------------------
-11)Implement callbacks inside  usb_descriptors.c OR in main.c (your choice):
+ 
+ 
+10)Implement callbacks inside  usb_descriptors.c OR in main.c (your choice):
 */
 //NOTE: here is the example of callbacks for BULK endpoints 
 void tud_vendor_rx_cb(uint8_t itf,  const uint8_t* buffer, uint32_t bufsize)
@@ -356,6 +351,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 		   GPIOB->BSRR = GPIO_BSRR_BS11;
 	  }
   }
+
 
 
 
