@@ -1,5 +1,6 @@
 /*To integrate  the TinyUSB into a STM32CubeIDE project:
- 1)Create a folder "libraries"
+ 1)Create a source folder "tinyusb" (project->rightClk->new->source folder)
+ When you create a simple folder - it doesnt worked (no compilation of librar c files)
 ----------------------------------***----------------------------------------
  2)Create inner folders "tinyusb/src/" 
    --------------------------------***--------------------------------------
@@ -15,16 +16,15 @@
  6) Add include pats inside compiler optoins:
    Project → Properties → C/C++ General → paths And Symbols → GNU C
    Push "Add" and insert consequently the next strings:
-    libraries/
-    libraries/TinyUSB
-    libraries/TinyUSB/src
-	libraries/TinyUSB/src/common
-	libraries/TinyUSB/src/device
-	libraries/TinyUSB/src/class
-	libraries/tinyusb/src/osal
-	libraries/TinyUSB/src/portable/st/stm32_fsdev
+    tinyusb
+    tinyusbB/src
+	tinyusb/src/common
+	tinyusb/src/device
+	tinyusb/src/class
+	tinyusb/src/osal
+	tinyusb/src/portable/st/stm32_fsdev
 	//NOTE1: FOR STM32F405 exclude  libraries/TinyUSB/src/portable/st/stm32_fsdev
-     and add libraries/tinyusb/src/portable/synopsys/dwc2 instead 
+     and add tinyusb/src/portable/synopsys/dwc2 instead 
 	NOTE2: Add neccessary in both "Assembly" and "GNU C" (these options are next each to other)
 	  --------------------------------***---------------------------------------
  7)Create in "Core/Inc/" confiuration file "tusb_config.h":
@@ -356,6 +356,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 		   GPIOB->BSRR = GPIO_BSRR_BS11;
 	  }
   }
+
 
 
 
