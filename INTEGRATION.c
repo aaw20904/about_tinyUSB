@@ -312,7 +312,7 @@ uint16_t const * tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 //NOTE: here is the example of callbacks for BULK endpoints 
 void tud_vendor_rx_cb(uint8_t itf,  const uint8_t* buffer, uint32_t bufsize)
 {
-
+//or Vendor class, this callback does NOT give you the actual received chunk
     uint32_t count = tud_vendor_available();
     if (count == 0){
     	return;
@@ -351,6 +351,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 		   GPIOB->BSRR = GPIO_BSRR_BS11;
 	  }
   }
+
 
 
 
