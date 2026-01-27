@@ -343,6 +343,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 	  if((mySemaphore & 0x00000001) && tud_ready() ){
 		  GPIOB->BSRR = GPIO_BSRR_BR10;
 		  mySemaphore &= ~0x00000001;
+		  //you can send more that 64 bytes: then tx_callback will be fired several times (for example 3 times for 150 bytes 64,64,22)
 		  uint32_t n = tud_vendor_write(outUsbBuffer, bytesReceived);
 		  if (n) {
 			   tud_vendor_write_flush();   // VERY important
@@ -351,6 +352,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 		   GPIOB->BSRR = GPIO_BSRR_BS11;
 	  }
   }
+
 
 
 
