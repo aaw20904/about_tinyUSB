@@ -73,7 +73,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
 }
-  tud_int_handler(0);   // call TinyUSB ISR
+ //DO IT MANDATORY for both handlers, othervise it will not working (device descriptor`s failure in a host)
 /*--------------------------------------***--------------------------------------------------
 9)Initialize TinyUSB in main():
 */
@@ -352,6 +352,7 @@ void tud_vendor_tx_cb(uint8_t itf, uint32_t sent_bytes)
 		   GPIOB->BSRR = GPIO_BSRR_BS11;
 	  }
   }
+
 
 
 
